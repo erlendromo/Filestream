@@ -18,7 +18,11 @@ func NewFileServer(p string) Server {
 	}
 }
 
+// Serve sets up a tcp-listener on the provided port,
+// and continously reads connections to the fileserver.
 func (fs *FileServer) Serve() {
+	defer recovery()
+
 	ln, err := net.Listen("tcp", fmt.Sprintf(":%s", fs.Port))
 	guard(err)
 
@@ -30,7 +34,10 @@ func (fs *FileServer) Serve() {
 	}
 }
 
+// readLoop reads the contents of the connection, and writes it to a buffer.
 func (fs *FileServer) readLoop(conn net.Conn) {
+	defer recovery()
+
 	buffer := new(bytes.Buffer)
 	var size int64
 
